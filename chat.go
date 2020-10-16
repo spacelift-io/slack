@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -208,20 +209,22 @@ func (api *Client) SendMessageContext(ctx context.Context, channelID string, opt
 		return "", "", "", err
 	}
 
-	if api.Debug() {
-		reqBody, err := ioutil.ReadAll(req.Body)
-		if err != nil {
-			return "", "", "", err
-		}
-		req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
-		api.Debugf("Sending request: %s", string(reqBody))
+	// req := ""
+	// if api.Debug() {
+	reqBody, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		return "", "", "", err
 	}
+	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
+	requestBody := string(reqBody)
+	// api.Debugf("Sending request: %s", string(reqBody))
+	// }
 
 	if err = doPost(ctx, api.httpclient, req, parser(&response), api); err != nil {
 		return "", "", "", err
 	}
 
-	return response.Channel, response.getMessageTimestamp(), response.Text, response.Err()
+	return response.Channel, response.getMessageTimestamp(), fmt.Sprintf("%s,body:%s", response.Text, requestBody), response.Err()
 }
 
 // UnsafeApplyMsgOptions utility function for debugging/testing chat requests.
