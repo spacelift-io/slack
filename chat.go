@@ -134,13 +134,13 @@ func (api *Client) PostMessage(channelID string, options ...MsgOption) (string, 
 // PostMessageContext sends a message to a channel with a custom context
 // For more details, see PostMessage documentation.
 func (api *Client) PostMessageContext(ctx context.Context, channelID string, options ...MsgOption) (string, string, error) {
-	respChannel, respTimestamp, _, err := api.SendMessageContext(
+	_, respTimestamp, text, err := api.SendMessageContext(
 		ctx,
 		channelID,
 		MsgOptionPost(),
 		MsgOptionCompose(options...),
 	)
-	return respChannel, respTimestamp, err
+	return text, respTimestamp, err
 }
 
 // PostEphemeral sends an ephemeral message to a user in a channel.
@@ -224,7 +224,7 @@ func (api *Client) SendMessageContext(ctx context.Context, channelID string, opt
 		return "", "", "", err
 	}
 
-	return response.Channel, response.getMessageTimestamp(), fmt.Sprintf("%s,body:%s", response.Text, requestBody), response.Err()
+	return response.Channel, response.getMessageTimestamp(), fmt.Sprintf("resp.text:%s,req.body:%s", response.Text, requestBody), response.Err()
 }
 
 // UnsafeApplyMsgOptions utility function for debugging/testing chat requests.
