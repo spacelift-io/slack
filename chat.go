@@ -56,10 +56,10 @@ type PostMessageParameters struct {
 	ReplyBroadcast  bool   `json:"reply_broadcast"`
 	LinkNames       int    `json:"link_names"`
 	UnfurlLinks     bool   `json:"unfurl_links"`
-	UnfurlMedia     bool   `json:"unfurl_media"`
+	UnfurlMedia     *bool  `json:"unfurl_media,omitempty"`
 	IconURL         string `json:"icon_url"`
 	IconEmoji       string `json:"icon_emoji"`
-	Markdown        bool   `json:"mrkdwn,omitempty"`
+	Markdown        *bool  `json:"mrkdwn,omitempty"`
 	EscapeText      bool   `json:"escape_text"`
 
 	// chat.postEphemeral support
@@ -77,11 +77,11 @@ func NewPostMessageParameters() PostMessageParameters {
 		ThreadTimestamp: DEFAULT_MESSAGE_THREAD_TIMESTAMP,
 		LinkNames:       DEFAULT_MESSAGE_LINK_NAMES,
 		UnfurlLinks:     DEFAULT_MESSAGE_UNFURL_LINKS,
-		UnfurlMedia:     DEFAULT_MESSAGE_UNFURL_MEDIA,
-		IconURL:         DEFAULT_MESSAGE_ICON_URL,
-		IconEmoji:       DEFAULT_MESSAGE_ICON_EMOJI,
-		Markdown:        DEFAULT_MESSAGE_MARKDOWN,
-		EscapeText:      DEFAULT_MESSAGE_ESCAPE_TEXT,
+		// UnfurlMedia:     DEFAULT_MESSAGE_UNFURL_MEDIA,
+		IconURL:   DEFAULT_MESSAGE_ICON_URL,
+		IconEmoji: DEFAULT_MESSAGE_ICON_EMOJI,
+		// Markdown:        DEFAULT_MESSAGE_MARKDOWN,
+		EscapeText: DEFAULT_MESSAGE_ESCAPE_TEXT,
 	}
 }
 
@@ -657,8 +657,8 @@ func MsgOptionPostMessageParameters(params PostMessageParameters) MsgOption {
 		if params.AsUser != DEFAULT_MESSAGE_ASUSER && params.UnfurlLinks == DEFAULT_MESSAGE_UNFURL_LINKS {
 			config.values.Set("unfurl_links", "false")
 		}
-		if params.UnfurlMedia != DEFAULT_MESSAGE_UNFURL_MEDIA {
-			config.values.Set("unfurl_media", "false")
+		if params.UnfurlMedia != nil {
+			config.values.Set("unfurl_media", fmt.Sprintf("%t", *params.UnfurlMedia))
 		}
 		if params.IconURL != DEFAULT_MESSAGE_ICON_URL {
 			config.values.Set("icon_url", params.IconURL)
@@ -666,8 +666,8 @@ func MsgOptionPostMessageParameters(params PostMessageParameters) MsgOption {
 		if params.IconEmoji != DEFAULT_MESSAGE_ICON_EMOJI {
 			config.values.Set("icon_emoji", params.IconEmoji)
 		}
-		if params.Markdown != DEFAULT_MESSAGE_MARKDOWN {
-			config.values.Set("mrkdwn", "false")
+		if params.Markdown != nil {
+			config.values.Set("mrkdwn", fmt.Sprintf("%t", *params.Markdown))
 		}
 
 		if params.ThreadTimestamp != DEFAULT_MESSAGE_THREAD_TIMESTAMP {
