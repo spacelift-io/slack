@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -134,13 +133,13 @@ func (api *Client) PostMessage(channelID string, options ...MsgOption) (string, 
 // PostMessageContext sends a message to a channel with a custom context
 // For more details, see PostMessage documentation.
 func (api *Client) PostMessageContext(ctx context.Context, channelID string, options ...MsgOption) (string, string, error) {
-	_, respTimestamp, body, err := api.SendMessageContext(
+	respChannel, respTimestamp, _, err := api.SendMessageContext(
 		ctx,
 		channelID,
 		MsgOptionPost(),
 		MsgOptionCompose(options...),
 	)
-	return body, respTimestamp, err
+	return respChannel, respTimestamp, err
 }
 
 // PostEphemeral sends an ephemeral message to a user in a channel.
@@ -209,20 +208,20 @@ func (api *Client) SendMessageContext(ctx context.Context, channelID string, opt
 		return "", "", "", err
 	}
 
-	// if api.Debug() {
-	reqBody, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		return "", "", "", err
+	if api.Debug() {
+		reqBody, err := ioutil.ReadAll(req.Body)
+		if err != nil {
+			return "", "", "", err
+		}
+		req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
+		api.Debugf("Sending request: %s", string(reqBody))
 	}
-	req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
-	// api.Debugf("Sending request: %s", string(reqBody))
-	// }
 
 	if err = doPost(ctx, api.httpclient, req, parser(&response), api); err != nil {
 		return "", "", "", err
 	}
 
-	return response.Channel, response.getMessageTimestamp(), fmt.Sprintf("Sending request: %s", string(reqBody)), response.Err()
+	return response.Channel, response.getMessageTimestamp(), response.Text, response.Err()
 }
 
 // UnsafeApplyMsgOptions utility function for debugging/testing chat requests.
