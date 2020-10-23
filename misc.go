@@ -39,11 +39,7 @@ func (t SlackResponse) Err() error {
 		return nil
 	}
 
-	metadata := fmt.Sprintf("cursor: %s ", t.ResponseMetadata.Cursor)
-	metadata += fmt.Sprintf("messages: %s ", strings.Join(t.ResponseMetadata.Messages, ","))
-	metadata += fmt.Sprintf("warnings: %s ", strings.Join(t.ResponseMetadata.Warnings, ","))
-
-	return errors.New(fmt.Sprintf("%s %s", t.Error, metadata))
+	return errors.New(t.Error)
 }
 
 // StatusCodeError represents an http response error.
