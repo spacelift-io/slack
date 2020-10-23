@@ -75,7 +75,7 @@ type Attachment struct {
 	Title     string `json:"title,omitempty"`
 	TitleLink string `json:"title_link,omitempty"`
 	Pretext   string `json:"pretext,omitempty"`
-	Text      string `json:"text,omitempty"` // Required
+	Text      string `json:"text,omitempty"` // Required only if Blocks are not attached
 
 	ImageURL string `json:"image_url,omitempty"`
 	ThumbURL string `json:"thumb_url,omitempty"`
